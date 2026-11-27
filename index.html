@@ -3,11 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>skylitpiano</title>
-<meta name="description" content="skylitpiano: piano music under the night sky. Play the keys, hear the pieces, find the links.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+<title>Skylit Piano</title>
+<meta name="description" content="Skylit Piano: an Android piano app made for calm evenings.">
 <style>
   :root {
     color-scheme: dark;
@@ -17,8 +14,9 @@
     --star: #ffe08a;
     --ivory: #f7f4ec;
     --ebony: #1a1626;
-    --serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
-    --sans: "Karla", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --gray: #9ca3af;
+    --brand: #8fa8ee;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
@@ -35,7 +33,9 @@
 
   header { padding: 1.1rem 0; }
   header .wrap { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
-  .logo { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; text-decoration: none; letter-spacing: .02em; }
+  .logo { font-size: 1.5rem; font-weight: 700; text-decoration: none; letter-spacing: -0.5px; }
+  .ba { color: var(--gray); }
+  .bb { color: var(--brand); }
   nav { display: flex; gap: 1.25rem; }
   nav a { text-decoration: none; padding: .25rem 0; border-bottom: 1px solid transparent; }
   nav a:hover { border-color: var(--star); }
@@ -54,12 +54,10 @@
   /* Hero */
   .hero { padding: 3rem 0 2rem; text-align: center; }
   h1 {
-    font-family: var(--serif);
-    font-size: clamp(3rem, 14vw, 6.5rem);
-    font-weight: 500;
-    font-style: italic;
-    line-height: 1;
-    letter-spacing: -.01em;
+    font-size: clamp(2.6rem, 11vw, 4.75rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.5px;
     margin-bottom: 1rem;
   }
   .tagline { font-size: 1.15rem; margin: 0 auto 2.25rem; max-width: 36ch; color: #dfe4ff; }
@@ -93,7 +91,7 @@
 
   /* Sections */
   section { padding: 3.5rem 0; }
-  h2 { font-family: var(--serif); font-size: clamp(1.9rem, 6vw, 2.6rem); font-weight: 700; margin-bottom: 1rem; }
+  h2 { font-size: clamp(1.5rem, 5vw, 2rem); font-weight: 700; letter-spacing: -0.5px; margin-bottom: 1rem; }
   p { max-width: 60ch; }
 
   .pieces { list-style: none; margin-top: 1.25rem; border-top: 1px solid rgba(255, 255, 255, .25); }
@@ -101,17 +99,17 @@
     display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
     padding: 1rem 0; border-bottom: 1px solid rgba(255, 255, 255, .25);
   }
-  .pieces strong { font-family: var(--serif); font-size: 1.35rem; font-weight: 700; }
+  .pieces strong { font-size: 1.05rem; font-weight: 700; }
   .pieces span { color: #c9d0ff; }
 
   .links { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.25rem; }
   .links a {
     border: 1px solid var(--star); color: var(--star); text-decoration: none;
-    padding: .65rem 1.3rem; border-radius: 999px; font-weight: 500;
+    padding: .65rem 1.3rem; border-radius: 4px; font-weight: 600;
   }
   .links a:hover { background: var(--star); color: var(--night); }
 
-  footer { padding: 2rem 0; text-align: center; font-size: .9rem; color: #c9d0ff; }
+  footer { padding: 1.5rem 0 2rem; text-align: center; font-size: .8rem; color: #c9d0ff; border-top: 1px solid rgba(255, 255, 255, .2); }
   footer p { max-width: 70ch; }
 
   @media (prefers-reduced-motion: reduce) {
@@ -126,7 +124,7 @@
 
 <header>
   <div class="wrap">
-    <a class="logo" href="#top">skylitpiano</a>
+    <a class="logo" href="#top"><span class="ba">Skylit</span> <span class="bb">Piano</span></a>
     <nav aria-label="Main">
       <a href="#about">About</a>
       <a href="#app">The app</a>
@@ -138,7 +136,7 @@
 <main id="top">
   <div class="hero">
     <div class="wrap">
-      <h1>skylitpiano</h1>
+      <h1><span class="ba">Skylit</span> <span class="bb">Piano</span></h1>
       <p class="tagline">Quiet piano music for late evenings and open skies.</p>
       <div class="piano-wrap">
         <div class="piano" id="piano" role="group" aria-label="Playable piano keyboard">
@@ -152,7 +150,7 @@
   <section id="about">
     <div class="wrap">
       <h2>About</h2>
-      <p>Skylit Piano is an Android app made for calm evenings. The full app is only for Android phones, The keyboard on this page is just a small demo to give you a feel for the sound.</p>
+      <p>Skylit Piano is an Android app made for calm evenings. The full app is only for Android phones. The keyboard on this page is just a small demo to give you a feel for the sound.</p>
     </div>
   </section>
 
@@ -182,7 +180,8 @@
 
 <footer>
   <div class="wrap">
-    <p style="margin:0 auto .5rem;">&copy; <span id="year">2026</span> skylitpiano &nbsp;|&nbsp; <a href="privacy.html">Privacy Policy</a></p>
+    <p style="margin:0 auto .25rem;font-weight:500;">&copy; Skylit Piano 2025&ndash;<span id="year">2026</span> &trade;</p>
+    <p style="margin:0 auto;font-size:.75rem;">All rights reserved &nbsp;&middot;&nbsp; <a href="privacy.html">Privacy Policy</a></p>
   </div>
 </footer>
 
