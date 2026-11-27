@@ -231,10 +231,9 @@
   var keys = document.getElementById('keys');
   var byKey = {};
   var ctx = null;
-  var piano = null;
-  var loading = false;
-  var loadPromise = null;
-  var activeNotes = {};
+var piano = null;
+var loadPromise = null;
+var compressor = null;
 
   function make(note, cls) {
     var el = document.createElement('div');
@@ -263,40 +262,45 @@ function getAudioContext() {
   if (!ctx) {
     ctx = new (window.AudioContext || window.webkitAudioContext)();
 
-    // Richer piano output
-   
-var compressor = ctx.createDynamicsCompressor();
+    compressor = ctx.createDynamicsCompressor();
 
-compressor.threshold.value = -18;
-compressor.knee.value = 20;
-compressor.ratio.value = 3;
-compressor.attack.value = 0.005;
-compressor.release.value = 0.25;
+    compressor.threshold.value = -18;
+    compressor.knee.value = 20;
+    compressor.ratio.value = 3;
+    compressor.attack.value = 0.005;
+    compressor.release.value = 0.25;
 
-compressor.connect(ctx.destination);
-
-loadPromise = Soundfont.instrument(
-  ctx,
-  'acoustic_grand_piano',
-  {
-    soundfont: 'FluidR3_GM',
-    format: 'mp3',
-    destination: compressor,
-    gain: 1
+    compressor.connect(ctx.destination);
   }
-).then(function (instrument) {
-  piano = instrument;
-  loading = false;
-  return piano;
-}).catch(function (err) {
-  loading = false;
-  loadPromise = null;
-  throw err;
-});
 
+  return ctx;
+}
 
-    return loadPromise;
-  }
+function loadPiano() {
+  if (piano) return Promise.resolve(piano);
+  if (loadPromise) return loadPromise;
+
+  var audio = getAudioContext();
+
+  loadPromise = Soundfont.instrument(
+    audio,
+    'acoustic_grand_piano',
+    {
+      soundfont: 'FluidR3_GM',
+      format: 'mp3',
+      destination: compressor,
+      gain: 1
+    }
+  ).then(function (instrument) {
+    piano = instrument;
+    return piano;
+  }).catch(function (err) {
+    loadPromise = null;
+    throw err;
+  });
+
+  return loadPromise;
+}
 
   function highlight(el) {
     el.classList.add('on');
@@ -308,38 +312,37 @@ loadPromise = Soundfont.instrument(
     }, 180);
   }
 
-  async function play(el) {
-    if (!el) return;
+ async function play(el) {
+  if (!el) return;
 
-    try {
-      var audio = getAudioContext();
+  try {
+    var audio = getAudioContext();
 
-      if (audio.state === 'suspended') {
-        await audio.resume();
-      }
-
-      highlight(el);
-
-      var instrument = await loadPiano();
-
-      if (audio.state === 'suspended') {
-        await audio.resume();
-      }
-
-    
-instrument.play(
-  Number(el.dataset.m),
-  audio.currentTime,
-  {
-    duration: 3,
-    gain: 1.15
-  }
-);
-
-    } catch (err) {
-      console.warn('Piano audio error:', err);
+    if (audio.state === 'suspended') {
+      await audio.resume();
     }
+
+    highlight(el);
+
+    var instrument = await loadPiano();
+
+    if (audio.state === 'suspended') {
+      await audio.resume();
+    }
+
+    instrument.play(
+      Number(el.dataset.m),
+      audio.currentTime,
+      {
+        duration: 3,
+        gain: 1.0
+      }
+    );
+
+  } catch (err) {
+    console.warn('Piano audio error:', err);
   }
+}
 
   // Pointer input
   keys.addEventListener('pointerdown', function (e) {
