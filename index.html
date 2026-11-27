@@ -182,6 +182,9 @@
   <div class="wrap">
     <p style="margin:0 auto .25rem;font-weight:500;">&copy; Skylit Piano 2025&ndash;<span id="year">2026</span> &trade;</p>
     <p style="margin:0 auto;font-size:.75rem;">All rights reserved &nbsp;&middot;&nbsp; <a href="privacy.html">Privacy Policy</a></p>
+    <p style="margin:0 auto;font-size:.7rem;opacity:.7;">
+  Piano sound: FluidR3_GM SoundFont
+</p>
   </div>
 </footer>
 
@@ -255,39 +258,42 @@
     keys.appendChild(el);
   });
 
-  function getAudioContext() {
-    if (!ctx) {
-      ctx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    return ctx;
+ 
+function getAudioContext() {
+  if (!ctx) {
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Richer piano output
+   
+var compressor = ctx.createDynamicsCompressor();
+
+compressor.threshold.value = -18;
+compressor.knee.value = 20;
+compressor.ratio.value = 3;
+compressor.attack.value = 0.005;
+compressor.release.value = 0.25;
+
+compressor.connect(ctx.destination);
+
+loadPromise = Soundfont.instrument(
+  ctx,
+  'acoustic_grand_piano',
+  {
+    soundfont: 'FluidR3_GM',
+    format: 'mp3',
+    destination: compressor,
+    gain: 1
   }
+).then(function (instrument) {
+  piano = instrument;
+  loading = false;
+  return piano;
+}).catch(function (err) {
+  loading = false;
+  loadPromise = null;
+  throw err;
+});
 
-  function loadPiano() {
-    if (piano) return Promise.resolve(piano);
-    if (loadPromise) return loadPromise;
-
-    if (!window.Soundfont) {
-      return Promise.reject(new Error('Soundfont unavailable'));
-    }
-
-    loading = true;
-
-    loadPromise = Soundfont.instrument(
-      getAudioContext(),
-      'acoustic_grand_piano',
-      {
-        soundfont: 'FluidR3_GM',
-        format: 'mp3'
-      }
-    ).then(function (instrument) {
-      piano = instrument;
-      loading = false;
-      return piano;
-    }).catch(function (err) {
-      loading = false;
-      loadPromise = null;
-      throw err;
-    });
 
     return loadPromise;
   }
@@ -320,14 +326,15 @@
         await audio.resume();
       }
 
-      instrument.play(
-        Number(el.dataset.m),
-        audio.currentTime,
-        {
-          duration: 2,
-          gain: 0.8
-        }
-      );
+    
+instrument.play(
+  Number(el.dataset.m),
+  audio.currentTime,
+  {
+    duration: 3,
+    gain: 1.15
+  }
+);
 
     } catch (err) {
       console.warn('Piano audio error:', err);
