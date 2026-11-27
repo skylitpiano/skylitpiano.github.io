@@ -196,28 +196,44 @@
     var st = document.createElement('i');
     st.style.left = Math.random() * 100 + '%';
     st.style.top = Math.random() * 70 + '%';
-    if (s % 3 === 0) { st.className = 'twinkle'; st.style.animationDelay = (Math.random() * 3.5) + 's'; }
+    if (s % 3 === 0) {
+      st.className = 'twinkle';
+      st.style.animationDelay = (Math.random() * 3.5) + 's';
+    }
     sky.appendChild(st);
   }
 
   // Keyboard layout: MIDI notes C4 (60) to E5 (76)
   var whites = [
-    { m: 60, n: 'C4', k: 'a' }, { m: 62, n: 'D4', k: 's' }, { m: 64, n: 'E4', k: 'd' },
-    { m: 65, n: 'F4', k: 'f' }, { m: 67, n: 'G4', k: 'g' }, { m: 69, n: 'A4', k: 'h' },
-    { m: 71, n: 'B4', k: 'j' }, { m: 72, n: 'C5', k: 'k' }, { m: 74, n: 'D5', k: 'l' },
+    { m: 60, n: 'C4', k: 'a' },
+    { m: 62, n: 'D4', k: 's' },
+    { m: 64, n: 'E4', k: 'd' },
+    { m: 65, n: 'F4', k: 'f' },
+    { m: 67, n: 'G4', k: 'g' },
+    { m: 69, n: 'A4', k: 'h' },
+    { m: 71, n: 'B4', k: 'j' },
+    { m: 72, n: 'C5', k: 'k' },
+    { m: 74, n: 'D5', k: 'l' },
     { m: 76, n: 'E5', k: ';' }
   ];
-  // after white index i: black note
+
   var blacks = [
-    { after: 0, m: 61, n: 'C#4', k: 'w' }, { after: 1, m: 63, n: 'D#4', k: 'e' },
-    { after: 3, m: 66, n: 'F#4', k: 't' }, { after: 4, m: 68, n: 'G#4', k: 'y' },
-    { after: 5, m: 70, n: 'A#4', k: 'u' }, { after: 7, m: 73, n: 'C#5', k: 'o' },
+    { after: 0, m: 61, n: 'C#4', k: 'w' },
+    { after: 1, m: 63, n: 'D#4', k: 'e' },
+    { after: 3, m: 66, n: 'F#4', k: 't' },
+    { after: 4, m: 68, n: 'G#4', k: 'y' },
+    { after: 5, m: 70, n: 'A#4', k: 'u' },
+    { after: 7, m: 73, n: 'C#5', k: 'o' },
     { after: 8, m: 75, n: 'D#5', k: 'p' }
   ];
 
   var keys = document.getElementById('keys');
   var byKey = {};
   var ctx = null;
+  var masterGain = null;
+  var compressor = null;
+  var piano = null;
+  var loading = false;
 
   function make(note, cls) {
     var el = document.createElement('div');
@@ -234,67 +250,123 @@
     el.textContent = w.k.toUpperCase();
     keys.appendChild(el);
   });
+
   blacks.forEach(function (b) {
     var el = make(b, 'black');
     el.style.left = ((b.after + 1) * 10) + '%';
     keys.appendChild(el);
   });
 
-  var piano = null, loading = false;
+  function initAudio() {
+    if (!ctx) {
+      var AudioCtx = window.AudioContext || window.webkitAudioContext;
+      ctx = new AudioCtx({ latencyHint: 'interactive' });
+
+      // Compressor audio clipping aur glitch ko rokta hai
+      compressor = ctx.createDynamicsCompressor();
+      compressor.threshold.setValueAtTime(-12, ctx.currentTime);
+      compressor.knee.setValueAtTime(15, ctx.currentTime);
+      compressor.ratio.setValueAtTime(6, ctx.currentTime);
+      compressor.attack.setValueAtTime(0.003, ctx.currentTime);
+      compressor.release.setValueAtTime(0.15, ctx.currentTime);
+
+      masterGain = ctx.createGain();
+      masterGain.gain.setValueAtTime(0.75, ctx.currentTime);
+
+      compressor.connect(masterGain);
+      masterGain.connect(ctx.destination);
+    }
+    if (ctx.state === 'suspended') {
+      ctx.resume();
+    }
+    loadPiano();
+  }
+
   function loadPiano() {
-    if (loading || !window.Soundfont || !ctx) return;
+    if (loading || piano || !window.Soundfont || !ctx) return;
     loading = true;
-    Soundfont.instrument(ctx, 'acoustic_grand_piano', { soundfont: 'FluidR3_GM', format: 'mp3' })
-      .then(function (p) { piano = p; })
-      .catch(function () { loading = false; });
+
+    // Sirf zaroori notes (60 se 76) load karein taake fast load ho aur memory kam lage
+    var neededNotes = whites.concat(blacks).map(function (item) { return item.n; });
+
+    Soundfont.instrument(ctx, 'acoustic_grand_piano', {
+      soundfont: 'FluidR3_GM',
+      format: 'mp3',
+      notes: neededNotes,
+      destination: compressor,
+      release: 0.4
+    })
+    .then(function (p) {
+      piano = p;
+      loading = false;
+    })
+    .catch(function () {
+      loading = false;
+    });
+  }
+
+  function playFallback(midi) {
+    var f = 440 * Math.pow(2, (midi - 69) / 12);
+    var t = ctx.currentTime;
+    var g = ctx.createGain();
+    g.connect(compressor);
+
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(0.25, t + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 1.5);
+
+    var o = ctx.createOscillator();
+    o.type = 'triangle'; // Sine se zyada soft piano-like tone
+    o.frequency.setValueAtTime(f, t);
+    o.connect(g);
+    o.start(t);
+    o.stop(t + 1.6);
   }
 
   function play(el) {
     try {
-      if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
-      if (ctx.state === 'suspended') ctx.resume();
-      loadPiano();
+      initAudio();
+      var midi = Number(el.dataset.m);
+
       if (piano) {
-        piano.play(Number(el.dataset.m), ctx.currentTime, { duration: 2, gain: 1.4 });
-        el.classList.add('on');
-        setTimeout(function () { el.classList.remove('on'); }, 180);
-        return;
+        // Gain 0.7 rakha hai taake chords bajane par sound na phate
+        piano.play(midi, ctx.currentTime, { duration: 1.8, gain: 0.7 });
+      } else {
+        playFallback(midi);
       }
-      var f = 440 * Math.pow(2, (Number(el.dataset.m) - 69) / 12);
-      var t = ctx.currentTime;
-      var g = ctx.createGain();
-      g.connect(ctx.destination);
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(0.35, t + 0.01);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + 1.8);
-      [[1, 1], [2, 0.25], [3, 0.08]].forEach(function (h) {
-        var o = ctx.createOscillator();
-        var hg = ctx.createGain();
-        o.type = 'sine';
-        o.frequency.value = f * h[0];
-        hg.gain.value = h[1];
-        o.connect(hg); hg.connect(g);
-        o.start(t); o.stop(t + 1.9);
-      });
-    } catch (e) { /* audio not available */ }
+    } catch (e) {
+      console.error(e);
+    }
+
     el.classList.add('on');
-    setTimeout(function () { el.classList.remove('on'); }, 180);
+    setTimeout(function () {
+      el.classList.remove('on');
+    }, 180);
   }
 
   // Pointer input
   keys.addEventListener('pointerdown', function (e) {
     var el = e.target.closest('.white, .black');
-    if (el) { e.preventDefault(); play(el); }
+    if (el) {
+      e.preventDefault();
+      play(el);
+    }
   });
 
   // Computer keyboard input
   var down = {};
   document.addEventListener('keydown', function (e) {
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
     var k = e.key.toLowerCase();
-    if (byKey[k] && !down[k]) { down[k] = true; play(byKey[k]); }
+    if (byKey[k] && !down[k]) {
+      down[k] = true;
+      play(byKey[k]);
+    }
   });
-  document.addEventListener('keyup', function (e) { down[e.key.toLowerCase()] = false; });
+
+  document.addEventListener('keyup', function (e) {
+    down[e.key.toLowerCase()] = false;
+  });
 })();
 </script>
 </body>
