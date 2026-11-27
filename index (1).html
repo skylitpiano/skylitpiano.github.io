@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>skylitpiano</title>
+<meta name="description" content="skylitpiano: piano music under the night sky. Play the keys, hear the pieces, find the links.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: dark;
+    --night: #141a45;
+    --dusk: #2d3a8c;
+    --glow: #8a9cf0;
+    --star: #ffe08a;
+    --ivory: #f7f4ec;
+    --ebony: #1a1626;
+    --serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+    --sans: "Karla", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--sans);
+    color: var(--ivory);
+    background: linear-gradient(180deg, var(--night) 0%, var(--dusk) 55%, #5b6ccf 100%) fixed;
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--star); outline-offset: 3px; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 1.25rem; }
+
+  header { padding: 1.1rem 0; }
+  header .wrap { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .logo { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; text-decoration: none; letter-spacing: .02em; }
+  nav { display: flex; gap: 1.25rem; }
+  nav a { text-decoration: none; padding: .25rem 0; border-bottom: 1px solid transparent; }
+  nav a:hover { border-color: var(--star); }
+
+  /* Stars */
+  .stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .stars i {
+    position: absolute; width: 3px; height: 3px; border-radius: 50%;
+    background: var(--star); opacity: .7;
+  }
+  .stars i:nth-child(odd) { width: 2px; height: 2px; opacity: .5; }
+  .stars i.twinkle { animation: tw 3.5s ease-in-out infinite; }
+  @keyframes tw { 50% { opacity: .1; } }
+  header, main, footer { position: relative; z-index: 1; }
+
+  /* Hero */
+  .hero { padding: 3rem 0 2rem; text-align: center; }
+  h1 {
+    font-family: var(--serif);
+    font-size: clamp(3rem, 14vw, 6.5rem);
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1;
+    letter-spacing: -.01em;
+    margin-bottom: 1rem;
+  }
+  .tagline { font-size: 1.15rem; margin: 0 auto 2.25rem; max-width: 36ch; color: #dfe4ff; }
+
+  /* Keyboard */
+  .piano-wrap { max-width: 760px; margin: 0 auto; }
+  .piano {
+    position: relative; display: flex; height: clamp(150px, 34vw, 240px);
+    padding: 10px 10px 0; background: var(--ebony); border-radius: 12px 12px 4px 4px;
+    box-shadow: 0 20px 50px rgba(5, 8, 30, .55);
+    touch-action: none; user-select: none; -webkit-user-select: none;
+  }
+  .keys { position: relative; display: flex; width: 100%; }
+  .white {
+    flex: 1; background: var(--ivory); border: 1px solid #c9c4b5; border-top: 0;
+    border-radius: 0 0 6px 6px; cursor: pointer; position: relative;
+    display: flex; align-items: flex-end; justify-content: center; padding-bottom: .5rem;
+    color: #7a7488; font-size: .75rem;
+    transition: background .12s;
+  }
+  .white.on { background: var(--star); }
+  .black {
+    position: absolute; top: 0; width: 6%; height: 62%; margin-left: -3%;
+    background: var(--ebony); border: 1px solid #000; border-top: 0;
+    border-radius: 0 0 5px 5px; cursor: pointer; z-index: 2;
+    box-shadow: 0 3px 4px rgba(0, 0, 0, .5);
+    transition: background .12s;
+  }
+  .black.on { background: #6b5bd6; }
+  .hint { margin-top: 1rem; font-size: .95rem; color: #c9d0ff; }
+
+  /* Sections */
+  section { padding: 3.5rem 0; }
+  h2 { font-family: var(--serif); font-size: clamp(1.9rem, 6vw, 2.6rem); font-weight: 700; margin-bottom: 1rem; }
+  p { max-width: 60ch; }
+
+  .pieces { list-style: none; margin-top: 1.25rem; border-top: 1px solid rgba(255, 255, 255, .25); }
+  .pieces li {
+    display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    padding: 1rem 0; border-bottom: 1px solid rgba(255, 255, 255, .25);
+  }
+  .pieces strong { font-family: var(--serif); font-size: 1.35rem; font-weight: 700; }
+  .pieces span { color: #c9d0ff; }
+
+  .links { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.25rem; }
+  .links a {
+    border: 1px solid var(--star); color: var(--star); text-decoration: none;
+    padding: .65rem 1.3rem; border-radius: 999px; font-weight: 500;
+  }
+  .links a:hover { background: var(--star); color: var(--night); }
+
+  footer { padding: 2rem 0; text-align: center; font-size: .9rem; color: #c9d0ff; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stars i.twinkle { animation: none; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars" aria-hidden="true"></div>
+
+<header>
+  <div class="wrap">
+    <a class="logo" href="#top">skylitpiano</a>
+    <nav aria-label="Main">
+      <a href="#about">About</a>
+      <a href="#pieces">Pieces</a>
+      <a href="#links">Links</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap">
+      <h1>skylitpiano</h1>
+      <p class="tagline">Quiet piano music for late evenings and open skies.</p>
+      <div class="piano-wrap">
+        <div class="piano" id="piano" role="group" aria-label="Playable piano keyboard">
+          <div class="keys" id="keys"></div>
+        </div>
+        <p class="hint" style="margin-inline:auto;">Tap the keys, or type: A S D F G H J K L ; for white keys, W E T Y U O P for black keys.</p>
+      </div>
+    </div>
+  </div>
+
+  <section id="about">
+    <div class="wrap">
+      <h2>About</h2>
+      <p>I play piano and share it here. This is a place for my pieces, practice notes and new recordings. Edit this paragraph in <code>index.html</code> to tell your own story.</p>
+    </div>
+  </section>
+
+  <section id="pieces">
+    <div class="wrap">
+      <h2>Pieces</h2>
+      <ul class="pieces">
+        <li><strong>Piece title one</strong> <span>Original composition</span></li>
+        <li><strong>Piece title two</strong> <span>Cover or arrangement</span></li>
+        <li><strong>Piece title three</strong> <span>Work in progress</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="links">
+    <div class="wrap">
+      <h2>Listen and follow</h2>
+      <p>Replace the <code>#</code> in each link with your own page.</p>
+      <div class="links">
+        <a href="#">YouTube</a>
+        <a href="#">Instagram</a>
+        <a href="#">Spotify</a>
+        <a href="#">Email</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>&copy; <span id="year">2026</span> skylitpiano</footer>
+
+<script>
+(function () {
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Stars
+  var sky = document.getElementById('stars');
+  for (var s = 0; s < 45; s++) {
+    var st = document.createElement('i');
+    st.style.left = Math.random() * 100 + '%';
+    st.style.top = Math.random() * 70 + '%';
+    if (s % 3 === 0) { st.className = 'twinkle'; st.style.animationDelay = (Math.random() * 3.5) + 's'; }
+    sky.appendChild(st);
+  }
+
+  // Keyboard layout: MIDI notes C4 (60) to E5 (76)
+  var whites = [
+    { m: 60, n: 'C4', k: 'a' }, { m: 62, n: 'D4', k: 's' }, { m: 64, n: 'E4', k: 'd' },
+    { m: 65, n: 'F4', k: 'f' }, { m: 67, n: 'G4', k: 'g' }, { m: 69, n: 'A4', k: 'h' },
+    { m: 71, n: 'B4', k: 'j' }, { m: 72, n: 'C5', k: 'k' }, { m: 74, n: 'D5', k: 'l' },
+    { m: 76, n: 'E5', k: ';' }
+  ];
+  // after white index i: black note
+  var blacks = [
+    { after: 0, m: 61, n: 'C#4', k: 'w' }, { after: 1, m: 63, n: 'D#4', k: 'e' },
+    { after: 3, m: 66, n: 'F#4', k: 't' }, { after: 4, m: 68, n: 'G#4', k: 'y' },
+    { after: 5, m: 70, n: 'A#4', k: 'u' }, { after: 7, m: 73, n: 'C#5', k: 'o' },
+    { after: 8, m: 75, n: 'D#5', k: 'p' }
+  ];
+
+  var keys = document.getElementById('keys');
+  var byKey = {};
+  var ctx = null;
+
+  function make(note, cls) {
+    var el = document.createElement('div');
+    el.className = cls;
+    el.setAttribute('role', 'button');
+    el.setAttribute('aria-label', note.n);
+    el.dataset.m = note.m;
+    byKey[note.k] = el;
+    return el;
+  }
+
+  whites.forEach(function (w) {
+    var el = make(w, 'white');
+    el.textContent = w.k.toUpperCase();
+    keys.appendChild(el);
+  });
+  blacks.forEach(function (b) {
+    var el = make(b, 'black');
+    el.style.left = ((b.after + 1) * 10) + '%';
+    keys.appendChild(el);
+  });
+
+  function play(el) {
+    try {
+      if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+      if (ctx.state === 'suspended') ctx.resume();
+      var f = 440 * Math.pow(2, (Number(el.dataset.m) - 69) / 12);
+      var t = ctx.currentTime;
+      var g = ctx.createGain();
+      g.connect(ctx.destination);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.35, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 1.8);
+      [[1, 1], [2, 0.25], [3, 0.08]].forEach(function (h) {
+        var o = ctx.createOscillator();
+        var hg = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.value = f * h[0];
+        hg.gain.value = h[1];
+        o.connect(hg); hg.connect(g);
+        o.start(t); o.stop(t + 1.9);
+      });
+    } catch (e) { /* audio not available */ }
+    el.classList.add('on');
+    setTimeout(function () { el.classList.remove('on'); }, 180);
+  }
+
+  // Pointer input
+  keys.addEventListener('pointerdown', function (e) {
+    var el = e.target.closest('.white, .black');
+    if (el) { e.preventDefault(); play(el); }
+  });
+
+  // Computer keyboard input
+  var down = {};
+  document.addEventListener('keydown', function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var k = e.key.toLowerCase();
+    if (byKey[k] && !down[k]) { down[k] = true; play(byKey[k]); }
+  });
+  document.addEventListener('keyup', function (e) { down[e.key.toLowerCase()] = false; });
+})();
+</script>
+</body>
+</html>
