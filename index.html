@@ -1,381 +1,301 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Skylit Piano</title>
-<meta name="description" content="Skylit Piano - An Android piano app.">
-
+<meta name="description" content="Skylit Piano: an Android piano app made for calm evenings.">
 <style>
-:root {
-    --night: #171d3d;
-    --dusk: #303e79;
+  :root {
+    color-scheme: dark;
+    --night: #141a45;
+    --dusk: #2d3a8c;
+    --glow: #8a9cf0;
+    --star: #ffe08a;
     --ivory: #f7f4ec;
     --ebony: #1a1626;
-    --gray: #c4c9dc;
-    --brand: #9aabed;
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-html {
-    scroll-behavior: smooth;
-}
-
-body {
-    font-family: Arial, Helvetica, sans-serif;
+    --gray: #9ca3af;
+    --brand: #8fa8ee;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--sans);
     color: var(--ivory);
-    background: linear-gradient(180deg, var(--night), var(--dusk));
-    line-height: 1.6;
+    background: linear-gradient(180deg, var(--night) 0%, var(--dusk) 55%, #5b6ccf 100%) fixed;
+    line-height: 1.65;
     min-height: 100vh;
-}
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--star); outline-offset: 3px; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 1.25rem; }
 
-.wrap {
-    max-width: 900px;
-    margin: auto;
-    padding: 0 20px;
-}
+  header { padding: 1.1rem 0; }
+  header .wrap { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .logo { font-size: 1.5rem; font-weight: 700; text-decoration: none; letter-spacing: -0.5px; }
+  .ba { color: var(--gray); }
+  .bb { color: var(--brand); }
+  nav { display: flex; gap: 1.25rem; }
+  nav a { text-decoration: none; padding: .25rem 0; border-bottom: 1px solid transparent; }
+  nav a:hover { border-color: var(--star); }
 
-header {
-    padding: 20px 0;
-}
+  /* Stars */
+  .stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .stars i {
+    position: absolute; width: 3px; height: 3px; border-radius: 50%;
+    background: var(--star); opacity: .7;
+  }
+  .stars i:nth-child(odd) { width: 2px; height: 2px; opacity: .5; }
+  .stars i.twinkle { animation: tw 3.5s ease-in-out infinite; }
+  @keyframes tw { 50% { opacity: .1; } }
+  header, main, footer { position: relative; z-index: 1; }
 
-header .wrap {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
-}
+  /* Hero */
+  .hero { padding: 3rem 0 2rem; text-align: center; }
+  h1 {
+    font-size: clamp(2.6rem, 11vw, 4.75rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.5px;
+    margin-bottom: 1rem;
+  }
+  .tagline { font-size: 1.15rem; margin: 0 auto 2.25rem; max-width: 36ch; color: #dfe4ff; }
 
-.logo {
-    font-size: 23px;
-    font-weight: bold;
-    text-decoration: none;
-}
+  /* Keyboard */
+  .piano-wrap { max-width: 760px; margin: 0 auto; }
+  .piano {
+    position: relative; display: flex; height: clamp(150px, 34vw, 240px);
+    padding: 10px 10px 0; background: var(--ebony); border-radius: 12px 12px 4px 4px;
+    box-shadow: 0 20px 50px rgba(5, 8, 30, .55);
+    touch-action: none; user-select: none; -webkit-user-select: none;
+  }
+  .keys { position: relative; display: flex; width: 100%; }
+  .white {
+    flex: 1; background: var(--ivory); border: 1px solid #c9c4b5; border-top: 0;
+    border-radius: 0 0 6px 6px; cursor: pointer; position: relative;
+    display: flex; align-items: flex-end; justify-content: center; padding-bottom: .5rem;
+    color: #7a7488; font-size: .75rem;
+    transition: background .12s;
+  }
+  .white.on { background: var(--star); }
+  .black {
+    position: absolute; top: 0; width: 6%; height: 62%; margin-left: -3%;
+    background: var(--ebony); border: 1px solid #000; border-top: 0;
+    border-radius: 0 0 5px 5px; cursor: pointer; z-index: 2;
+    box-shadow: 0 3px 4px rgba(0, 0, 0, .5);
+    transition: background .12s;
+  }
+  .black.on { background: #6b5bd6; }
+  .hint { margin-top: 1rem; font-size: .95rem; color: #c9d0ff; }
 
-.ba {
-    color: white;
-}
+  /* Sections */
+  section { padding: 3.5rem 0; }
+  h2 { font-size: clamp(1.5rem, 5vw, 2rem); font-weight: 700; letter-spacing: -0.5px; margin-bottom: 1rem; }
+  p { max-width: 60ch; }
 
-.bb {
-    color: var(--brand);
-}
+  .pieces { list-style: none; margin-top: 1.25rem; border-top: 1px solid rgba(255, 255, 255, .25); }
+  .pieces li {
+    display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    padding: 1rem 0; border-bottom: 1px solid rgba(255, 255, 255, .25);
+  }
+  .pieces strong { font-size: 1.05rem; font-weight: 700; }
+  .pieces span { color: #c9d0ff; }
 
-nav {
-    display: flex;
-    gap: 22px;
-}
+  .links { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.25rem; }
+  .links a {
+    border: 1px solid var(--star); color: var(--star); text-decoration: none;
+    padding: .65rem 1.3rem; border-radius: 4px; font-weight: 600;
+  }
+  .links a:hover { background: var(--star); color: var(--night); }
 
-nav a {
-    color: white;
-    text-decoration: none;
-    font-size: 14px;
-}
+  footer { padding: 1.5rem 0 2rem; text-align: center; font-size: .8rem; color: #c9d0ff; border-top: 1px solid rgba(255, 255, 255, .2); }
+  footer p { max-width: 70ch; }
 
-nav a:hover {
-    color: var(--brand);
-}
-
-/* Hero */
-
-.hero {
-    text-align: center;
-    padding: 65px 0 45px;
-}
-
-h1 {
-    font-size: clamp(40px, 9vw, 70px);
-    line-height: 1.1;
-    margin-bottom: 15px;
-}
-
-.tagline {
-    color: #d8def7;
-    font-size: 17px;
-    margin: 0 auto 45px;
-    text-align: center;
-}
-
-/* Piano keyboard - display only */
-
-.piano-wrap {
-    max-width: 720px;
-    margin: auto;
-}
-
-.piano {
-    display: flex;
-    height: clamp(145px, 30vw, 220px);
-    padding: 10px 10px 0;
-    background: var(--ebony);
-    border-radius: 12px 12px 4px 4px;
-    box-shadow: 0 15px 35px rgba(0,0,0,.35);
-    user-select: none;
-}
-
-.keys {
-    position: relative;
-    display: flex;
-    width: 100%;
-}
-
-.white {
-    flex: 1;
-    background: var(--ivory);
-    border: 1px solid #c9c4b5;
-    border-top: 0;
-    border-radius: 0 0 5px 5px;
-}
-
-.black {
-    position: absolute;
-    top: 0;
-    width: 6%;
-    height: 62%;
-    margin-left: -3%;
-    background: var(--ebony);
-    border: 1px solid #000;
-    border-top: 0;
-    border-radius: 0 0 5px 5px;
-    z-index: 2;
-}
-
-/* Sections */
-
-section {
-    padding: 55px 0;
-}
-
-h2 {
-    font-size: 28px;
-    margin-bottom: 15px;
-}
-
-p {
-    color: #e0e4f5;
-    max-width: 65ch;
-}
-
-.pieces {
-    list-style: none;
-    margin-top: 22px;
-    border-top: 1px solid rgba(255,255,255,.2);
-}
-
-.pieces li {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    flex-wrap: wrap;
-    padding: 15px 0;
-    border-bottom: 1px solid rgba(255,255,255,.2);
-}
-
-.pieces span {
-    color: var(--gray);
-}
-
-/* Links */
-
-.links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 22px;
-}
-
-.links a {
-    padding: 10px 22px;
-    border: 1px solid var(--brand);
-    border-radius: 5px;
-    color: white;
-    text-decoration: none;
-    transition: .2s;
-}
-
-.links a:hover {
-    background: var(--brand);
-    color: var(--night);
-}
-
-/* Footer */
-
-footer {
-    margin-top: 30px;
-    padding: 25px 0;
-    text-align: center;
-    border-top: 1px solid rgba(255,255,255,.2);
-    color: var(--gray);
-    font-size: 13px;
-}
-
-footer a {
-    color: var(--brand);
-}
-
-/* Mobile */
-
-@media(max-width: 500px) {
-    header .wrap {
-        justify-content: center;
-    }
-
-    nav {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .hero {
-        padding-top: 45px;
-    }
-
-    section {
-        padding: 40px 0;
-    }
-}
+  @media (prefers-reduced-motion: reduce) {
+    .stars i.twinkle { animation: none; }
+    html { scroll-behavior: auto; }
+  }
 </style>
 </head>
-
 <body>
 
-<header>
-    <div class="wrap">
-        <a class="logo" href="#top">
-            <span class="ba">Skylit</span>
-            <span class="bb">Piano</span>
-        </a>
+<div class="stars" id="stars" aria-hidden="true"></div>
 
-        <nav>
-            <a href="#about">About</a>
-            <a href="#app">The App</a>
-            <a href="#contact">Contact</a>
-        </nav>
-    </div>
+<header>
+  <div class="wrap">
+    <a class="logo" href="#top"><span class="ba">Skylit</span> <span class="bb">Piano</span></a>
+    <nav aria-label="Main">
+      <a href="#about">About</a>
+      <a href="#app">The app</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
 </header>
 
 <main id="top">
-
-    <div class="hero">
-        <div class="wrap">
-
-            <h1>
-                <span class="ba">Skylit</span>
-                <span class="bb">Piano</span>
-            </h1>
-
-            <p class="tagline">
-                Quiet piano music for late evenings and open skies.
-            </p>
-
-            <div class="piano-wrap">
-                <div class="piano" aria-label="Piano keyboard demonstration">
-                    <div class="keys">
-
-                        <div class="white"></div>
-                        <div class="white"></div>
-                        <div class="white"></div>
-                        <div class="white"></div>
-                        <div class="white"></div>
-                        <div class="white"></div>
-                        <div class="white"></div>
-                        <div class="white"></div>
-                        <div class="white"></div>
-                        <div class="white"></div>
-
-                        <div class="black" style="left:10%"></div>
-                        <div class="black" style="left:20%"></div>
-                        <div class="black" style="left:40%"></div>
-                        <div class="black" style="left:50%"></div>
-                        <div class="black" style="left:60%"></div>
-                        <div class="black" style="left:80%"></div>
-                        <div class="black" style="left:90%"></div>
-
-                    </div>
-                </div>
-            </div>
-
+  <div class="hero">
+    <div class="wrap">
+      <h1><span class="ba">Skylit</span> <span class="bb">Piano</span></h1>
+      <p class="tagline">Quiet piano music for late evenings and open skies.</p>
+      <div class="piano-wrap">
+        <div class="piano" id="piano" role="group" aria-label="Playable piano keyboard">
+          <div class="keys" id="keys"></div>
         </div>
+        <p class="hint" style="margin-inline:auto;">Tap the keys, or type: A S D F G H J K L ; for white keys, W E T Y U O P for black keys.</p>
+      </div>
     </div>
+  </div>
 
-    <section id="about">
-        <div class="wrap">
-            <h2>About</h2>
-            <p>
-                Skylit Piano is an Android app made for calm evenings.
-                The full app is designed for Android phones.
-            </p>
-        </div>
-    </section>
+  <section id="about">
+    <div class="wrap">
+      <h2>About</h2>
+      <p>Skylit Piano is an Android app made for calm evenings. The full app is only for Android phones. The keyboard on this page is just a small demo to give you a feel for the sound.</p>
+    </div>
+  </section>
 
-    <section id="app">
-        <div class="wrap">
-            <h2>The App</h2>
+  <section id="app">
+    <div class="wrap">
+      <h2>The app</h2>
+      <p>Skylit Piano is an Android app for playing piano on your phone.</p>
+      <ul class="pieces">
+        <li><strong>Touch keys</strong> <span>Play with a realistic piano sound</span></li>
+        <li><strong>Online features</strong> <span>Needs an internet connection</span></li>
+        <li><strong>Playing together</strong> <span>Coming in a future update</span></li>
+      </ul>
+    </div>
+  </section>
 
-            <p>
-                Skylit Piano is an Android app for playing piano
-                on your phone.
-            </p>
-
-            <ul class="pieces">
-                <li>
-                    <strong>Touch Keys</strong>
-                    <span>Play with a realistic piano sound</span>
-                </li>
-
-                <li>
-                    <strong>Online Features</strong>
-                    <span>Internet connection required</span>
-                </li>
-
-                <li>
-                    <strong>Playing Together</strong>
-                    <span>Coming in a future update</span>
-                </li>
-            </ul>
-        </div>
-    </section>
-
-    <section id="contact">
-        <div class="wrap">
-            <h2>Contact</h2>
-
-            <p>
-                Questions, bug reports or ideas?
-                Write to us and we will reply as soon as we can.
-            </p>
-
-            <div class="links">
-                <a href="mailto:skylitpiano@gmail.com?subject=Skylit%20Piano">
-                    Email Us
-                </a>
-
-                <a href="privacy.html">
-                    Privacy Policy
-                </a>
-            </div>
-        </div>
-    </section>
-
+  <section id="contact">
+    <div class="wrap">
+      <h2>Contact</h2>
+      <p>Questions, bug reports or ideas? Write to us and we will reply as soon as we can.</p>
+      <div class="links">
+        <a href="mailto:skylitpiano@gmail.com?subject=Skylit%20Piano">Email us</a>
+        <a href="privacy.html">Privacy Policy</a>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer>
-    <div class="wrap">
-        <p style="margin:auto">
-            &copy; Skylit Piano 2025–2026 &trade;
-        </p>
-
-        <p style="margin:auto;font-size:12px">
-            All rights reserved ·
-            <a href="privacy.html">Privacy Policy</a>
-        </p>
-    </div>
+  <div class="wrap">
+    <p style="margin:0 auto .25rem;font-weight:500;">&copy; Skylit Piano 2025&ndash;<span id="year">2026</span> &trade;</p>
+    <p style="margin:0 auto;font-size:.75rem;">All rights reserved &nbsp;&middot;&nbsp; <a href="privacy.html">Privacy Policy</a></p>
+  </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/soundfont-player@0.12.0/dist/soundfont-player.min.js"></script>
+<script>
+(function () {
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Stars
+  var sky = document.getElementById('stars');
+  for (var s = 0; s < 45; s++) {
+    var st = document.createElement('i');
+    st.style.left = Math.random() * 100 + '%';
+    st.style.top = Math.random() * 70 + '%';
+    if (s % 3 === 0) { st.className = 'twinkle'; st.style.animationDelay = (Math.random() * 3.5) + 's'; }
+    sky.appendChild(st);
+  }
+
+  // Keyboard layout: MIDI notes C4 (60) to E5 (76)
+  var whites = [
+    { m: 60, n: 'C4', k: 'a' }, { m: 62, n: 'D4', k: 's' }, { m: 64, n: 'E4', k: 'd' },
+    { m: 65, n: 'F4', k: 'f' }, { m: 67, n: 'G4', k: 'g' }, { m: 69, n: 'A4', k: 'h' },
+    { m: 71, n: 'B4', k: 'j' }, { m: 72, n: 'C5', k: 'k' }, { m: 74, n: 'D5', k: 'l' },
+    { m: 76, n: 'E5', k: ';' }
+  ];
+  // after white index i: black note
+  var blacks = [
+    { after: 0, m: 61, n: 'C#4', k: 'w' }, { after: 1, m: 63, n: 'D#4', k: 'e' },
+    { after: 3, m: 66, n: 'F#4', k: 't' }, { after: 4, m: 68, n: 'G#4', k: 'y' },
+    { after: 5, m: 70, n: 'A#4', k: 'u' }, { after: 7, m: 73, n: 'C#5', k: 'o' },
+    { after: 8, m: 75, n: 'D#5', k: 'p' }
+  ];
+
+  var keys = document.getElementById('keys');
+  var byKey = {};
+  var ctx = null;
+
+  function make(note, cls) {
+    var el = document.createElement('div');
+    el.className = cls;
+    el.setAttribute('role', 'button');
+    el.setAttribute('aria-label', note.n);
+    el.dataset.m = note.m;
+    byKey[note.k] = el;
+    return el;
+  }
+
+  whites.forEach(function (w) {
+    var el = make(w, 'white');
+    el.textContent = w.k.toUpperCase();
+    keys.appendChild(el);
+  });
+  blacks.forEach(function (b) {
+    var el = make(b, 'black');
+    el.style.left = ((b.after + 1) * 10) + '%';
+    keys.appendChild(el);
+  });
+
+  var piano = null, loading = false;
+  function loadPiano() {
+    if (loading || !window.Soundfont || !ctx) return;
+    loading = true;
+    Soundfont.instrument(ctx, 'acoustic_grand_piano', { soundfont: 'FluidR3_GM', format: 'mp3' })
+      .then(function (p) { piano = p; })
+      .catch(function () { loading = false; });
+  }
+
+  function play(el) {
+    try {
+      if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+      if (ctx.state === 'suspended') ctx.resume();
+      loadPiano();
+      if (piano) {
+        piano.play(Number(el.dataset.m), ctx.currentTime, { duration: 2, gain: 1.4 });
+        el.classList.add('on');
+        setTimeout(function () { el.classList.remove('on'); }, 180);
+        return;
+      }
+      var f = 440 * Math.pow(2, (Number(el.dataset.m) - 69) / 12);
+      var t = ctx.currentTime;
+      var g = ctx.createGain();
+      g.connect(ctx.destination);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.35, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 1.8);
+      [[1, 1], [2, 0.25], [3, 0.08]].forEach(function (h) {
+        var o = ctx.createOscillator();
+        var hg = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.value = f * h[0];
+        hg.gain.value = h[1];
+        o.connect(hg); hg.connect(g);
+        o.start(t); o.stop(t + 1.9);
+      });
+    } catch (e) { /* audio not available */ }
+    el.classList.add('on');
+    setTimeout(function () { el.classList.remove('on'); }, 180);
+  }
+
+  // Pointer input
+  keys.addEventListener('pointerdown', function (e) {
+    var el = e.target.closest('.white, .black');
+    if (el) { e.preventDefault(); play(el); }
+  });
+
+  // Computer keyboard input
+  var down = {};
+  document.addEventListener('keydown', function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var k = e.key.toLowerCase();
+    if (byKey[k] && !down[k]) { down[k] = true; play(byKey[k]); }
+  });
+  document.addEventListener('keyup', function (e) { down[e.key.toLowerCase()] = false; });
+})();
+</script>
 </body>
 </html>
