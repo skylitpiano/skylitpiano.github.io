@@ -112,6 +112,7 @@
   .links a:hover { background: var(--star); color: var(--night); }
 
   footer { padding: 2rem 0; text-align: center; font-size: .9rem; color: #c9d0ff; }
+  footer p { max-width: 70ch; }
 
   @media (prefers-reduced-motion: reduce) {
     .stars i.twinkle { animation: none; }
@@ -128,8 +129,8 @@
     <a class="logo" href="#top">skylitpiano</a>
     <nav aria-label="Main">
       <a href="#about">About</a>
-      <a href="#pieces">Pieces</a>
-      <a href="#links">Links</a>
+      <a href="#app">The app</a>
+      <a href="#contact">Contact</a>
     </nav>
   </div>
 </header>
@@ -151,37 +152,41 @@
   <section id="about">
     <div class="wrap">
       <h2>About</h2>
-      <p>I play piano and share it here. This is a place for my pieces, practice notes and new recordings. Edit this paragraph in <code>index.html</code> to tell your own story.</p>
+      <p>Skylit Piano is an Android app made for calm evenings. The full app is only for Android phones, The keyboard on this page is just a small demo to give you a feel for the sound.</p>
     </div>
   </section>
 
-  <section id="pieces">
+  <section id="app">
     <div class="wrap">
-      <h2>Pieces</h2>
+      <h2>The app</h2>
+      <p>Skylit Piano is an Android app for playing piano on your phone.</p>
       <ul class="pieces">
-        <li><strong>Piece title one</strong> <span>Original composition</span></li>
-        <li><strong>Piece title two</strong> <span>Cover or arrangement</span></li>
-        <li><strong>Piece title three</strong> <span>Work in progress</span></li>
+        <li><strong>Touch keys</strong> <span>Play with a realistic piano sound</span></li>
+        <li><strong>Online features</strong> <span>Needs an internet connection</span></li>
+        <li><strong>Playing together</strong> <span>Coming in a future update</span></li>
       </ul>
     </div>
   </section>
 
-  <section id="links">
+  <section id="contact">
     <div class="wrap">
-      <h2>Listen and follow</h2>
-      <p>Replace the <code>#</code> in each link with your own page.</p>
+      <h2>Contact</h2>
+      <p>Questions, bug reports or ideas? Write to us and we will reply as soon as we can.</p>
       <div class="links">
-        <a href="#">YouTube</a>
-        <a href="#">Instagram</a>
-        <a href="#">Spotify</a>
-        <a href="#">Email</a>
+        <a href="mailto:skylitpiano@gmail.com?subject=Skylit%20Piano">Email us</a>
+        <a href="privacy.html">Privacy Policy</a>
       </div>
     </div>
   </section>
 </main>
 
-<footer>&copy; <span id="year">2026</span> skylitpiano</footer>
+<footer>
+  <div class="wrap">
+    <p style="margin:0 auto .5rem;">&copy; <span id="year">2026</span> skylitpiano &nbsp;|&nbsp; <a href="privacy.html">Privacy Policy</a></p>
+  </div>
+</footer>
 
+<script src="https://cdn.jsdelivr.net/npm/soundfont-player@0.12.0/dist/soundfont-player.min.js"></script>
 <script>
 (function () {
   document.getElementById('year').textContent = new Date().getFullYear();
@@ -236,10 +241,26 @@
     keys.appendChild(el);
   });
 
+  var piano = null, loading = false;
+  function loadPiano() {
+    if (loading || !window.Soundfont || !ctx) return;
+    loading = true;
+    Soundfont.instrument(ctx, 'acoustic_grand_piano', { soundfont: 'FluidR3_GM', format: 'mp3' })
+      .then(function (p) { piano = p; })
+      .catch(function () { loading = false; });
+  }
+
   function play(el) {
     try {
       if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
       if (ctx.state === 'suspended') ctx.resume();
+      loadPiano();
+      if (piano) {
+        piano.play(Number(el.dataset.m), ctx.currentTime, { duration: 2, gain: 1.4 });
+        el.classList.add('on');
+        setTimeout(function () { el.classList.remove('on'); }, 180);
+        return;
+      }
       var f = 440 * Math.pow(2, (Number(el.dataset.m) - 69) / 12);
       var t = ctx.currentTime;
       var g = ctx.createGain();
