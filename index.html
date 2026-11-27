@@ -1,25 +1,26 @@
-```html
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Skylit Piano</title>
-<meta name="description" content="Skylit Piano: an Android piano app made for calm evenings.">
+<meta name="description" content="Skylit Piano - An Android piano app.">
 
 <style>
 :root {
-    --bg: #20264d;
-    --blue: #8fa8ee;
-    --white: #f7f4ec;
-    --muted: #c9d0e8;
-    --border: rgba(255,255,255,.15);
+    --night: #171d3d;
+    --dusk: #303e79;
+    --ivory: #f7f4ec;
+    --ebony: #1a1626;
+    --gray: #c4c9dc;
+    --brand: #9aabed;
 }
 
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
 html {
@@ -27,25 +28,24 @@ html {
 }
 
 body {
-    font-family: Arial, sans-serif;
-    color: var(--white);
-    background: linear-gradient(160deg, #141a35, #252f65, #343f79);
-    line-height: 1.7;
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--ivory);
+    background: linear-gradient(180deg, var(--night), var(--dusk));
+    line-height: 1.6;
     min-height: 100vh;
 }
 
 .wrap {
     max-width: 900px;
     margin: auto;
-    padding: 0 22px;
+    padding: 0 20px;
 }
 
 header {
-    padding: 22px 0;
-    border-bottom: 1px solid var(--border);
+    padding: 20px 0;
 }
 
-.header {
+header .wrap {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -57,12 +57,14 @@ header {
     font-size: 23px;
     font-weight: bold;
     text-decoration: none;
-    color: var(--white);
 }
 
-.logo span,
-h1 span {
-    color: var(--blue);
+.ba {
+    color: white;
+}
+
+.bb {
+    color: var(--brand);
 }
 
 nav {
@@ -71,115 +73,165 @@ nav {
 }
 
 nav a {
-    color: var(--muted);
+    color: white;
     text-decoration: none;
     font-size: 14px;
 }
 
 nav a:hover {
-    color: var(--blue);
+    color: var(--brand);
 }
+
+/* Hero */
 
 .hero {
     text-align: center;
-    padding: 100px 15px 90px;
+    padding: 65px 0 45px;
 }
 
 h1 {
-    font-size: clamp(40px, 8vw, 65px);
-    line-height: 1.2;
-    margin-bottom: 18px;
+    font-size: clamp(40px, 9vw, 70px);
+    line-height: 1.1;
+    margin-bottom: 15px;
 }
 
 .tagline {
-    color: var(--muted);
+    color: #d8def7;
     font-size: 17px;
-    max-width: 450px;
+    margin-bottom: 45px;
+}
+
+/* Piano keyboard - display only */
+
+.piano-wrap {
+    max-width: 720px;
     margin: auto;
 }
 
+.piano {
+    display: flex;
+    height: clamp(145px, 30vw, 220px);
+    padding: 10px 10px 0;
+    background: var(--ebony);
+    border-radius: 12px 12px 4px 4px;
+    box-shadow: 0 15px 35px rgba(0,0,0,.35);
+    user-select: none;
+}
+
+.keys {
+    position: relative;
+    display: flex;
+    width: 100%;
+}
+
+.white {
+    flex: 1;
+    background: var(--ivory);
+    border: 1px solid #c9c4b5;
+    border-top: 0;
+    border-radius: 0 0 5px 5px;
+}
+
+.black {
+    position: absolute;
+    top: 0;
+    width: 6%;
+    height: 62%;
+    margin-left: -3%;
+    background: var(--ebony);
+    border: 1px solid #000;
+    border-top: 0;
+    border-radius: 0 0 5px 5px;
+    z-index: 2;
+}
+
+/* Sections */
+
 section {
     padding: 55px 0;
-    border-top: 1px solid var(--border);
 }
 
 h2 {
-    font-size: 27px;
+    font-size: 28px;
     margin-bottom: 15px;
 }
 
 p {
-    color: var(--muted);
-    max-width: 650px;
+    color: #e0e4f5;
+    max-width: 65ch;
 }
 
-.features {
-    margin-top: 25px;
+.pieces {
     list-style: none;
+    margin-top: 22px;
+    border-top: 1px solid rgba(255,255,255,.2);
 }
 
-.features li {
-    padding: 15px 0;
-    border-bottom: 1px solid var(--border);
+.pieces li {
     display: flex;
     justify-content: space-between;
-    gap: 15px;
+    gap: 10px;
     flex-wrap: wrap;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255,255,255,.2);
 }
 
-.features strong {
-    color: var(--white);
+.pieces span {
+    color: var(--gray);
 }
 
-.features span {
-    color: var(--muted);
-    font-size: 14px;
-}
+/* Links */
 
 .links {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
-    margin-top: 25px;
+    margin-top: 22px;
 }
 
 .links a {
     padding: 10px 22px;
-    border: 1px solid var(--blue);
-    border-radius: 6px;
+    border: 1px solid var(--brand);
+    border-radius: 5px;
+    color: white;
     text-decoration: none;
-    color: var(--blue);
     transition: .2s;
 }
 
 .links a:hover {
-    background: var(--blue);
-    color: #141a35;
+    background: var(--brand);
+    color: var(--night);
 }
 
+/* Footer */
+
 footer {
+    margin-top: 30px;
+    padding: 25px 0;
     text-align: center;
-    padding: 25px 15px;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid rgba(255,255,255,.2);
+    color: var(--gray);
     font-size: 13px;
 }
 
 footer a {
-    color: var(--blue);
-    text-decoration: none;
+    color: var(--brand);
 }
 
-@media(max-width:500px) {
-    .header {
-        flex-direction: column;
+/* Mobile */
+
+@media(max-width: 500px) {
+    header .wrap {
+        justify-content: center;
     }
 
     nav {
-        gap: 18px;
+        width: 100%;
+        justify-content: center;
     }
 
     .hero {
-        padding: 75px 10px;
+        padding-top: 45px;
     }
 
     section {
@@ -192,9 +244,10 @@ footer a {
 <body>
 
 <header>
-    <div class="wrap header">
-        <a href="#top" class="logo">
-            Skylit <span>Piano</span>
+    <div class="wrap">
+        <a class="logo" href="#top">
+            <span class="ba">Skylit</span>
+            <span class="bb">Piano</span>
         </a>
 
         <nav>
@@ -208,10 +261,45 @@ footer a {
 <main id="top">
 
     <div class="hero">
-        <h1>Skylit <span>Piano</span></h1>
-        <p class="tagline">
-            Quiet piano music for late evenings and open skies.
-        </p>
+        <div class="wrap">
+
+            <h1>
+                <span class="ba">Skylit</span>
+                <span class="bb">Piano</span>
+            </h1>
+
+            <p class="tagline">
+                Quiet piano music for late evenings and open skies.
+            </p>
+
+            <div class="piano-wrap">
+                <div class="piano" aria-label="Piano keyboard demonstration">
+                    <div class="keys">
+
+                        <div class="white"></div>
+                        <div class="white"></div>
+                        <div class="white"></div>
+                        <div class="white"></div>
+                        <div class="white"></div>
+                        <div class="white"></div>
+                        <div class="white"></div>
+                        <div class="white"></div>
+                        <div class="white"></div>
+                        <div class="white"></div>
+
+                        <div class="black" style="left:10%"></div>
+                        <div class="black" style="left:20%"></div>
+                        <div class="black" style="left:40%"></div>
+                        <div class="black" style="left:50%"></div>
+                        <div class="black" style="left:60%"></div>
+                        <div class="black" style="left:80%"></div>
+                        <div class="black" style="left:90%"></div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <section id="about">
@@ -227,12 +315,13 @@ footer a {
     <section id="app">
         <div class="wrap">
             <h2>The App</h2>
+
             <p>
                 Skylit Piano is an Android app for playing piano
                 on your phone.
             </p>
 
-            <ul class="features">
+            <ul class="pieces">
                 <li>
                     <strong>Touch Keys</strong>
                     <span>Play with a realistic piano sound</span>
@@ -240,7 +329,7 @@ footer a {
 
                 <li>
                     <strong>Online Features</strong>
-                    <span>Needs an internet connection</span>
+                    <span>Internet connection required</span>
                 </li>
 
                 <li>
@@ -254,6 +343,7 @@ footer a {
     <section id="contact">
         <div class="wrap">
             <h2>Contact</h2>
+
             <p>
                 Questions, bug reports or ideas?
                 Write to us and we will reply as soon as we can.
@@ -275,23 +365,16 @@ footer a {
 
 <footer>
     <div class="wrap">
-        <p style="margin:auto;">
-            &copy; Skylit Piano 2025-<span id="year"></span>
-            &trade;
+        <p style="margin:auto">
+            &copy; Skylit Piano 2025–2026 &trade;
         </p>
 
-        <p style="margin:auto;">
-            All rights reserved &middot;
+        <p style="margin:auto;font-size:12px">
+            All rights reserved ·
             <a href="privacy.html">Privacy Policy</a>
         </p>
     </div>
 </footer>
 
-<script>
-document.getElementById("year").textContent =
-    new Date().getFullYear();
-</script>
-
 </body>
 </html>
-```
